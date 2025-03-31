@@ -22,44 +22,44 @@
 <body class="bg-white text-black">
 
   <!-- Header -->
-  <header class="bg-black text-white shadow-sm border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+  <header class="bg-black text-white shadow border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <a href="/" class="flex items-center space-x-3">
-        <img src="BP_logo.png" alt="Bimmer Plug" class="h-7">
+        <img src="https://via.placeholder.com/100x30?text=Logo" alt="Bimmer Plug" class="h-7">
       </a>
-      <nav class="space-x-8 text-sm font-semibold tracking-wide">
-        <a href="/" class="hover:text-[#0693E3]">Home</a>
-        <a href="https://bimmerplug.com" class="hover:text-[#0693E3]">Shop</a>
-        <a href="https://help.bimmerplug.com/en-US" class="hover:text-[#0693E3]">Support</a>
+      <nav class="space-x-6 text-sm font-semibold tracking-wide">
+        <a href="/" class="https://bimmerplug.com">Home</a>
+        <a href="https://bimmerplug.com" class="hover:text-[#0693E3] transition">Shop</a>
+        <a href="https://help.bimmerplug.com/en-US" class="hover:text-[#0693E3] transition">Support</a>
       </nav>
     </div>
   </header>
 
-  <!-- Chat Section -->
-  <section class="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-10">
-    <div class="mb-8">
-      <h2 class="text-3xl font-bold mb-2">Live Chat</h2>
-      <p class="text-gray-700 text-lg">We're here to help. Ask us anything about Bimmer Plug products or services.</p>
+<!-- Chat Section -->
+<section class="max-w-4xl mx-auto px-4 py-10">
+  <div class="mb-6">
+    <h2 class="text-3xl font-bold text-gray-900">Live Chat</h2>
+    <p class="text-gray-600 mt-1 text-lg">We’re here to help! Ask us anything about Bimmer Plug products or services.</p>
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-xl shadow-lg p-6 flex flex-col min-h-[500px] max-h-[80vh] overflow-hidden">
+    <div id="chatHistory" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
+      <!-- Chat messages will appear here -->
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 sm:p-8 flex flex-col min-h-[600px] max-h-[85vh] overflow-hidden">
-      <div id="chatHistory" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
-        <!-- Chat messages will appear here -->
-      </div>
+    <div id="typingIndicator" class="text-sm text-gray-400 mb-2 hidden">Staff is typing...</div>
 
-      <div id="typingIndicator" class="text-sm text-gray-400 mb-2 hidden">Staff is typing...</div>
-
-      <form id="chatForm" class="flex flex-col sm:flex-row gap-3">
-        <input type="text" id="userInput" placeholder="Type your message..." class="flex-1 border border-gray-300 rounded-md px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0693E3] transition text-sm" required />
-        <button type="submit" class="bg-[#0693E3] hover:bg-blue-700 text-white px-5 py-2 rounded-md font-medium shadow-md transition text-sm flex items-center justify-center">
-          Send
-        </button>
-        <button type="button" id="endChat" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-medium shadow-md transition text-sm">
-          End Chat
-        </button>
-      </form>
-    </div>
-  </section>
+    <form id="chatForm" class="flex flex-col sm:flex-row gap-3">
+      <input type="text" id="userInput" placeholder="Type your message..." class="flex-1 border border-gray-300 rounded-md px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0693E3] text-sm" required />
+      <button type="submit" class="bg-[#0693E3] hover:bg-blue-600 text-white px-5 py-2 rounded-md font-medium shadow transition text-sm">
+        Send
+      </button>
+      <button type="button" id="endChat" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md font-medium shadow transition text-sm">
+        End
+      </button>
+    </form>
+  </div>
+</section>
 
   <!-- Footer -->
   <footer class="bg-black text-white border-t border-gray-800 text-sm mt-12">
@@ -77,7 +77,7 @@
 </div>
 
       <div class="flex space-x-8 font-medium">
-        <a href="/" class="hover:text-[#0693E3]">Home</a>
+        <a href="https://bimmerplug.com                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                " class="hover:text-[#0693E3]">Home</a>
         <a href="https://bimmerplug.com" class="hover:text-[#0693E3]">Shop</a>
         <a href="/contact" class="hover:text-[#0693E3]">Contact</a>
       </div>
