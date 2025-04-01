@@ -1,4 +1,4 @@
-⚠️ Hosting Info
+Hosting Info
 This chat app uses Socket.IO, which needs a backend server to work. But GitHub Pages only hosts static files (like HTML, CSS, and JavaScript) — it can't run the server part.
 
 To make the chat work:
