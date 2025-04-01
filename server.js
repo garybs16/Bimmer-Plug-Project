@@ -10,14 +10,13 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-app.use(cors());
 
-// Serve static files (like index.html, staff.html) from current directory
-app.use(express.static(path.join(__dirname)));
+app.use(cors());
+app.use(express.static(path.join(__dirname))); // Serve static files from current dir
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5500', // Replace with your frontend URL if needed
+    origin: ['http://localhost:5500', 'https://bimmerplug-work.onrender.com'],
     methods: ['GET', 'POST']
   }
 });
@@ -107,6 +106,7 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log('🚀 Chat server running on http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 Chat server running on http://localhost:${PORT}`);
 });
