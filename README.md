@@ -7,5 +7,5 @@ Host the front-end (this code) on GitHub Pages or any static hosting service.
 
 Host the backend server (Socket.IO) on a platform like Render, Railway, Glitch, or Vercel.
 
-Then, change the Socket.IO URL in your code from http://localhost:3000 to your server’s live URL.
+
 
