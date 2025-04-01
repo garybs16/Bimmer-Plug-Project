@@ -11,9 +11,11 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
+// Middleware
 app.use(cors());
-app.use(express.static(path.join(__dirname))); // Serve static files from current dir
+app.use(express.static(path.join(__dirname))); // Serve index.html, staff.html, etc.
 
+// Allow frontend connections (local + deployed)
 const io = new Server(server, {
   cors: {
     origin: ['http://localhost:5500', 'https://bimmerplug-work.onrender.com'],
@@ -33,7 +35,7 @@ if (fs.existsSync(historyFile)) {
   }
 }
 
-// Email settings
+// Email setup
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -71,12 +73,14 @@ function sendChatTranscript(messages) {
   });
 }
 
-// Socket.IO Events
+// Socket.IO logic
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
 
+  // Send chat history on connection
   socket.emit('chat history', chatHistory);
 
+  // Handle new chat messages
   socket.on('chat message', (msg) => {
     const sanitizedText = (msg.text || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const message = {
@@ -89,10 +93,12 @@ io.on('connection', (socket) => {
     io.emit('chat message', message);
   });
 
+  // Typing indicator
   socket.on('typing', (data) => {
     socket.broadcast.emit('typing', data);
   });
 
+  // Chat end
   socket.on('end chat', () => {
     console.log('📩 Chat ended. Sending transcript...');
     sendChatTranscript(chatHistory);
@@ -106,6 +112,17 @@ io.on('connection', (socket) => {
   });
 });
 
+// Optional health check route
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
+// Optional fallback to index.html (useful for SPA routing)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Start server (use Render-assigned PORT if available)
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Chat server running on http://localhost:${PORT}`);
