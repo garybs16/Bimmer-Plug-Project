@@ -68,6 +68,7 @@
   </header>
 
 <!-- Chat Section -->
+<!-- Chat Section -->
 <section class="max-w-4xl mx-auto px-4 py-10">
   <!-- Outer glass container -->
   <div class="bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl p-6 ring-1 ring-white/20">
@@ -83,7 +84,12 @@
         <!-- Chat messages will appear here -->
       </div>
 
-      <div id="typingIndicator" class="text-sm text-gray-500 mb-2 hidden">Staff is typing...</div>
+      <!-- Typing indicator with animation -->
+      <div id="typingIndicator" class="text-sm text-gray-500 mb-2 hidden">
+        Staff is typing<span class="typing-dots ml-1">
+          <span>.</span><span>.</span><span>.</span>
+        </span>
+      </div>
 
       <form id="chatForm" class="flex flex-col sm:flex-row gap-3">
         <input type="text" id="userInput" placeholder="Type your message..." class="flex-1 border border-gray-300 rounded-md px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0693E3] text-sm" required />
