@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bimmer Plug Live Chat</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
     body {
       font-family: 'Inter', sans-serif;
     }
@@ -17,235 +18,142 @@
       0% { opacity: 0; transform: translateY(10px); }
       100% { opacity: 1; transform: translateY(0); }
     }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: url('affliate_page_img_1.webp');
+      background-size: cover;
+      background-position: center;
+      filter: blur(6px);
+      opacity: 0.8;
+    }
+
+    .typing-dots span {
+      animation: bounce 1s infinite;
+      display: inline-block;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-4px); }
+    }
   </style>
-
-  <style>
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-image: url('affliate_page_img_1.webp');
-    background-size: cover;
-    background-position: center;
-    filter: blur(5px);
-  }
-
-
-  .typing-dots span {
-  animation: bounce 1s infinite;
-  display: inline-block;
-}
-.typing-dots span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.typing-dots span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-@keyframes bounce {
-  0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-4px); }
-}
-
-</style>
-
 </head>
-<body class="bg-cover bg-center text-black" style="background-image: url('affliate_page_img_1.webp');">
 
+<body class="text-black min-h-screen flex flex-col justify-between bg-cover bg-center">
 
   <!-- Header -->
   <header class="bg-black text-white shadow border-b border-gray-800">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <a href="/" class="flex items-center space-x-3">
-        <img src="BP_logo.png" alt="Bimmer Plug" class="h-7">
+        <img src="BP_logo.png" alt="Bimmer Plug Logo" class="h-8">
       </a>
       <nav class="space-x-6 text-sm font-semibold tracking-wide">
-        <a href="/" class="https://bimmerplug.com">Home</a>
+        <a href="/" class="hover:text-[#0693E3] transition">Home</a>
         <a href="https://bimmerplug.com" class="hover:text-[#0693E3] transition">Shop</a>
         <a href="https://help.bimmerplug.com/en-US" class="hover:text-[#0693E3] transition">Support</a>
       </nav>
     </div>
   </header>
 
-<!-- Chat Section -->
-<!-- Chat Section -->
-<section class="max-w-4xl mx-auto px-4 py-10">
-  <!-- Outer glass container -->
-  <div class="bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl p-6 ring-1 ring-white/20">
+  <!-- Chat Section -->
+  <main class="flex-grow py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto bg-white/30 backdrop-blur-lg rounded-2xl shadow-2xl ring-1 ring-white/20 p-8">
 
-    <div class="mb-6">
-      <h2 class="text-3xl font-bold text-gray-900">Live Chat</h2>
-      <p class="text-gray-800 mt-1 text-lg">We’re here to help! Ask us anything about Bimmer Plug products or services.</p>
-    </div>
+      <header class="mb-6">
+        <h1 class="text-4xl font-bold text-gray-900">Live Chat</h1>
+        <p class="text-gray-800 mt-2 text-lg">We’re here to help. Ask us anything about Bimmer Plug products or services.</p>
+      </header>
 
-    <!-- Inner glass container (chat box) -->
-    <div class="bg-white/30 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 flex flex-col min-h-[500px] max-h-[80vh] overflow-hidden">
-      <div id="chatHistory" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
-        <!-- Chat messages will appear here -->
+      <div class="bg-white/40 backdrop-blur-xl border border-white/30 rounded-2xl p-6 flex flex-col min-h-[500px] max-h-[75vh] overflow-hidden shadow-inner">
+        <div id="chatHistory" class="flex-1 overflow-y-auto space-y-4 pr-1 mb-4 scroll-smooth"></div>
+
+        <div id="typingIndicator" class="text-sm text-gray-600 mb-2 hidden">
+          Staff is typing<span class="typing-dots ml-1"><span>.</span><span>.</span><span>.</span></span>
+        </div>
+
+        <form id="chatForm" class="flex gap-3">
+          <input type="text" id="userInput" placeholder="Type your message..."
+            class="flex-1 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0693E3] text-sm" required />
+
+          <button type="submit"
+            class="bg-[#0693E3] hover:bg-blue-600 text-white p-3 rounded-full shadow-md transition">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+
+          <button type="button" id="endChat"
+            class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-md transition">
+            <i class="fas fa-circle-xmark"></i>
+          </button>
+        </form>
       </div>
-
-      <!-- Typing indicator with animation -->
-      <div id="typingIndicator" class="text-sm text-gray-500 mb-2 hidden">
-        Staff is typing<span class="typing-dots ml-1">
-          <span>.</span><span>.</span><span>.</span>
-        </span>
-      </div>
-
-      <form id="chatForm" class="flex items-center gap-3">
-  <input type="text" id="userInput" placeholder="Type your message..." 
-    class="flex-1 border border-gray-300 rounded-md px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0693E3] text-sm" required />
-
-  <button type="submit" class="bg-[#0693E3] hover:bg-blue-600 text-white p-3 rounded-full shadow transition text-sm flex items-center justify-center">
-    <i class="fas fa-paper-plane"></i>
-  </button>
-
-  <button type="button" id="endChat" class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow transition text-sm flex items-center justify-center">
-    <i class="fas fa-circle-xmark"></i>
-  </button>
-</form>
-
     </div>
-
-  </div>
-</section>
+  </main>
 
   <!-- Footer -->
-  <footer class="bg-black text-white border-t border-gray-800 text-sm mt-12">
-    <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col items-center space-y-6">
-      <!-- Include Font Awesome (if not already included) -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
-<div class="flex space-x-6">
-  <a href="https://facebook.com" target="_blank" class="hover:text-[#0693E3]">
-    <i class="fab fa-facebook fa-xl"></i>
-  </a>
-  <a href="https://instagram.com" target="_blank" class="hover:text-[#0693E3]">
-    <i class="fab fa-instagram fa-xl"></i>
-  </a>
-</div>
-
+  <footer class="bg-black text-white border-t border-gray-800 text-sm">
+    <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+      <div class="flex space-x-6">
+        <a href="https://facebook.com" target="_blank" class="hover:text-[#0693E3]">
+          <i class="fab fa-facebook fa-xl"></i>
+        </a>
+        <a href="https://instagram.com" target="_blank" class="hover:text-[#0693E3]">
+          <i class="fab fa-instagram fa-xl"></i>
+        </a>
+      </div>
       <div class="flex space-x-8 font-medium">
-        <a href="https://bimmerplug.com                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                " class="hover:text-[#0693E3]">Home</a>
+        <a href="https://bimmerplug.com" class="hover:text-[#0693E3]">Home</a>
         <a href="https://bimmerplug.com" class="hover:text-[#0693E3]">Shop</a>
         <a href="/contact" class="hover:text-[#0693E3]">Contact</a>
       </div>
     </div>
   </footer>
 
-  <!-- Socket.IO + Chat Script -->
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script>
-    const socket = io('https://bimmerplug-work.onrender.com');
-
-
     const chatForm = document.getElementById('chatForm');
     const userInput = document.getElementById('userInput');
     const chatHistory = document.getElementById('chatHistory');
     const typingIndicator = document.getElementById('typingIndicator');
-    const endChatButton = document.getElementById('endChat');
-
-    const formatTime = (dateStr) => {
-      const date = new Date(dateStr);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
-
-    function renderMessage(msg) {
+  
+    const formatTime = (dateStr) => new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  
+    const renderMessage = (msg, from = 'staff') => {
       const wrapper = document.createElement('div');
-      wrapper.className = `fade-in ${msg.from === 'customer' ? 'text-right' : 'text-left'}`;
+      wrapper.className = `fade-in ${from === 'customer' ? 'text-right' : 'text-left'}`;
       wrapper.innerHTML = `
-        <div class="${msg.from === 'customer' ? 'bg-black text-white ml-auto' : 'bg-[#E8F4FD] text-black'} inline-block px-4 py-2 rounded-xl max-w-[80%]">
-          ${msg.text}
-          <div class="text-xs text-gray-500 mt-1">${formatTime(msg.timestamp)}</div>
+        <div class="${from === 'customer' ? 'bg-black text-white ml-auto' : 'bg-[#E8F4FD] text-black'} inline-block px-4 py-2 rounded-xl max-w-[80%] shadow">
+          ${msg}
+          <div class="text-xs text-gray-500 mt-1">${formatTime(new Date())}</div>
         </div>
       `;
       chatHistory.appendChild(wrapper);
       chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
-
-    function saveMessage(msg) {
-      const existing = JSON.parse(localStorage.getItem('chatHistory')) || [];
-      existing.push(msg);
-      localStorage.setItem('chatHistory', JSON.stringify(existing));
-    }
-
-    socket.on('chat history', (history) => {
-      chatHistory.innerHTML = '';
-      localStorage.setItem('chatHistory', JSON.stringify(history));
-      history.forEach(renderMessage);
-    });
-
-    socket.on('chat message', (msg) => {
-      renderMessage(msg);
-      saveMessage(msg);
-    });
-
-    socket.on('chat ended', () => {
-      chatHistory.innerHTML = '';
-      localStorage.removeItem('chatHistory');
-      alert("Chat has been ended by staff.");
-    });
-
-    chatForm.addEventListener('submit', function(e) {
+    };
+  
+    const showTypingIndicator = () => typingIndicator.classList.remove('hidden');
+    const hideTypingIndicator = () => typingIndicator.classList.add('hidden');
+  
+    chatForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const text = userInput.value.trim();
-      if (!text) return;
-
-      const msg = {
-        from: 'customer',
-        text
-      };
-      socket.emit('chat message', msg);
+      const userMsg = userInput.value.trim();
+      if (!userMsg) return;
+  
+      renderMessage(userMsg, 'customer');
       userInput.value = '';
-    });
-
-    endChatButton.addEventListener('click', () => {
-      if (confirm("Are you sure you want to end the chat?")) {
-        socket.emit('end chat');
-      }
+  
+      showTypingIndicator();
+      setTimeout(() => {
+        hideTypingIndicator();
+        renderMessage("Thanks for reaching out! The available staff will be here soon", 'staff');
+      }, 1500);
     });
   </script>
-
-  <script>
-  let botReplyTimer = null;
-
-  chatForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const text = userInput.value.trim();
-    if (!text) return;
-
-    const msg = {
-      from: 'customer',
-      text
-    };
-    socket.emit('chat message', msg);
-    userInput.value = '';
-
-    typingIndicator.classList.remove('hidden');
-
-    if (botReplyTimer) clearTimeout(botReplyTimer);
-    botReplyTimer = setTimeout(() => {
-      typingIndicator.classList.add('hidden');
-      const botReply = getBotReply(text);
-      if (botReply) {
-        const botMsg = {
-          from: 'staff',
-          text: botReply,
-          timestamp: new Date().toISOString()
-        };
-        renderMessage(botMsg);
-        saveMessage(botMsg);
-      }
-    }, 2000);
-  });
-
-  function getBotReply(userText) {
-    const text = userText.toLowerCase();
-    if (text.includes('return')) return "You can return products within 30 days. Please visit our return policy page.";
-    if (text.includes('order')) return "Can you please provide your order number so we can assist?";
-    if (text.includes('hello') || text.includes('hi')) return "Hi there! How can we help you today?";
-    return "Thanks for your message! A staff member will respond shortly.";
-  }
-</script>
 
 </body>
 </html>
