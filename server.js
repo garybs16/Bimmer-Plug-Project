@@ -127,3 +127,46 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Chat server running on http://localhost:${PORT}`);
 });
+
+
+
+//extra
+let botReplyTimer = null;
+
+chatForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const text = userInput.value.trim();
+  if (!text) return;
+
+  const msg = {
+    from: 'customer',
+    text
+  };
+  socket.emit('chat message', msg);
+  userInput.value = '';
+
+  typingIndicator.classList.remove('hidden');
+
+  if (botReplyTimer) clearTimeout(botReplyTimer);
+  botReplyTimer = setTimeout(() => {
+    typingIndicator.classList.add('hidden');
+    const botReply = getBotReply(text);
+    if (botReply) {
+      const botMsg = {
+        from: 'staff',
+        text: botReply,
+        timestamp: new Date().toISOString()
+      };
+      renderMessage(botMsg);
+      saveMessage(botMsg);
+    }
+  }, 2000);
+});
+
+function getBotReply(userText) {
+  const text = userText.toLowerCase();
+  if (text.includes('return')) return "You can return products within 30 days. Please visit our return policy page.";
+  if (text.includes('order')) return "Can you please provide your order number so we can assist?";
+  if (text.includes('hello') || text.includes('hi')) return "Hi there! How can we help you today?";
+  return "Thanks for your message! A staff member will respond shortly.";
+}
