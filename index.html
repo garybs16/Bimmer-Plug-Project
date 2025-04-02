@@ -86,75 +86,128 @@
 
   <!-- Socket.IO + Chat Script -->
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-  <script>
-    const socket = io('http://localhost:3000'); // Change to your server URL if deployed
+<script>
+  const socket = io('https://bimmerplug-work.onrender.com');
+  const chatForm = document.getElementById('chatForm');
+  const userInput = document.getElementById('userInput');
+  const chatHistory = document.getElementById('chatHistory');
+  const typingIndicator = document.getElementById('typingIndicator');
+  const endChatButton = document.getElementById('endChat');
 
-    const chatForm = document.getElementById('chatForm');
-    const userInput = document.getElementById('userInput');
-    const chatHistory = document.getElementById('chatHistory');
-    const typingIndicator = document.getElementById('typingIndicator');
-    const endChatButton = document.getElementById('endChat');
+  const formatTime = (dateStr) => new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    const formatTime = (dateStr) => {
-      const date = new Date(dateStr);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
+  const renderMessage = (msg) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = fade-in ${msg.from === 'customer' ? 'text-right' : 'text-left'};
+    wrapper.innerHTML = 
+      <div class="${msg.from === 'customer' ? 'bg-black text-white ml-auto' : 'bg-[#E8F4FD] text-black'} inline-block px-4 py-2 rounded-xl max-w-[80%] shadow">
+        ${msg.text}
+        <div class="text-xs text-gray-500 mt-1">${formatTime(msg.timestamp)}</div>
+      </div>
+    ;
+    chatHistory.appendChild(wrapper);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  };
 
-    function renderMessage(msg) {
-      const wrapper = document.createElement('div');
-      wrapper.className = `fade-in ${msg.from === 'customer' ? 'text-right' : 'text-left'}`;
-      wrapper.innerHTML = `
-        <div class="${msg.from === 'customer' ? 'bg-black text-white ml-auto' : 'bg-[#E8F4FD] text-black'} inline-block px-4 py-2 rounded-xl max-w-[80%]">
-          ${msg.text}
-          <div class="text-xs text-gray-500 mt-1">${formatTime(msg.timestamp)}</div>
-        </div>
-      `;
-      chatHistory.appendChild(wrapper);
-      chatHistory.scrollTop = chatHistory.scrollHeight;
+  const saveMessage = (msg) => {
+    const existing = JSON.parse(localStorage.getItem('chatHistory')) || [];
+    existing.push(msg);
+    localStorage.setItem('chatHistory', JSON.stringify(existing));
+  };
+
+  function getBotReply(text) {
+    const lower = text.toLowerCase();
+    if (lower.includes('return')) return "You can return products within 30 days. Please visit our return policy page.";
+    if (lower.includes('order')) return "Can you please provide your order number so we can assist?";
+    if (lower.includes('hello') || lower.includes('hi')) return "Hi there! How can we help you today?";
+    return "Thanks for your message! A staff member will respond shortly.";
+  }
+
+  function showTypingIndicator() {
+    typingIndicator.classList.remove('hidden');
+  }
+
+  function hideTypingIndicator() {
+    typingIndicator.classList.add('hidden');
+  }
+
+  let botReplyTimer = null;
+
+  // 🔁 Handle form submission
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = userInput.value.trim();
+    if (!text) return;
+
+    const userMsg = { from: 'customer', text, timestamp: new Date().toISOString() };
+    socket.emit('chat message', userMsg);
+    renderMessage(userMsg);
+    saveMessage(userMsg);
+    userInput.value = '';
+
+    const botReply = getBotReply(text);
+    if (botReply) {
+      showTypingIndicator();
+      if (botReplyTimer) clearTimeout(botReplyTimer);
+      botReplyTimer = setTimeout(() => {
+        hideTypingIndicator();
+        const botMsg = {
+          from: 'staff',
+          text: botReply,
+          timestamp: new Date().toISOString()
+        };
+        renderMessage(botMsg);
+        saveMessage(botMsg);
+      }, 2000);
     }
+  });
 
-    function saveMessage(msg) {
-      const existing = JSON.parse(localStorage.getItem('chatHistory')) || [];
-      existing.push(msg);
-      localStorage.setItem('chatHistory', JSON.stringify(existing));
+  // 🔘 Handle end chat button
+  endChatButton.addEventListener('click', () => {
+    if (confirm("Are you sure you want to end the chat?")) {
+      socket.emit('end chat');
     }
+  });
 
-    socket.on('chat history', (history) => {
-      chatHistory.innerHTML = '';
-      localStorage.setItem('chatHistory', JSON.stringify(history));
-      history.forEach(renderMessage);
-    });
+  // ⏳ Load existing chat history
+  socket.on('chat history', (history) => {
+    chatHistory.innerHTML = '';
+    localStorage.setItem('chatHistory', JSON.stringify(history));
+    history.forEach(renderMessage);
+  });
 
-    socket.on('chat message', (msg) => {
-      renderMessage(msg);
-      saveMessage(msg);
-    });
+  // 🔔 Handle incoming messages
+  socket.on('chat message', (msg) => {
+    renderMessage(msg);
+    saveMessage(msg);
+  });
 
-    socket.on('chat ended', () => {
-      chatHistory.innerHTML = '';
-      localStorage.removeItem('chatHistory');
-      alert("Chat has been ended by staff.");
-    });
+  // ❌ Handle chat end
+  socket.on('chat ended', () => {
+    chatHistory.innerHTML = '';
+    localStorage.removeItem('chatHistory');
+    alert("Chat has been ended by staff.");
+  });
 
-    chatForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const text = userInput.value.trim();
-      if (!text) return;
-
-      const msg = {
-        from: 'customer',
-        text
+  // 👋 Auto welcome message
+  window.addEventListener('DOMContentLoaded', () => {
+  const hasHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]').length > 0;
+  if (!hasHistory) {
+    showTypingIndicator();
+    setTimeout(() => {
+      hideTypingIndicator();
+      const welcomeMsg = {
+        from: 'staff',
+        text: "Thanks for reaching out! Your wait time is greater than 15 minutes.",
+        timestamp: new Date().toISOString()
       };
-      socket.emit('chat message', msg);
-      userInput.value = '';
-    });
+      renderMessage(welcomeMsg);
+      saveMessage(welcomeMsg);
+    }, 1500);
+  }
+});
 
-    endChatButton.addEventListener('click', () => {
-      if (confirm("Are you sure you want to end the chat?")) {
-        socket.emit('end chat');
-      }
-    });
-  </script>
+</script>
 
 </body>
 </html>
