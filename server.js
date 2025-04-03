@@ -91,6 +91,20 @@ io.on('connection', (socket) => {
     chatHistory.push(message);
     saveChatHistory();
     io.emit('chat message', message);
+
+    // Auto-reply from staff (only if customer sends message)
+    if (msg.from === 'customer') {
+      setTimeout(() => {
+        const autoReply = {
+          from: 'staff',
+          text: 'Thanks for reaching out! We’ll be with you shortly.',
+          timestamp: new Date().toISOString()
+        };
+        chatHistory.push(autoReply);
+        saveChatHistory();
+        io.emit('chat message', autoReply);
+      }, 1000); // Delay for realism
+    }
   });
 
   // Typing indicator
@@ -127,4 +141,3 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Chat server running on http://localhost:${PORT}`);
 });
-
