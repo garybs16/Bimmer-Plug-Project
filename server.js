@@ -36,8 +36,6 @@ if (fs.existsSync(historyFile)) {
 }
 
 // 🔥 Clear old messages for testing
-chatHistory = [];
-saveChatHistory();
 let chatHistory = [];
 const historyFile = './chatHistory.json';
 if (fs.existsSync(historyFile)) {
@@ -52,6 +50,7 @@ if (fs.existsSync(historyFile)) {
 // 🔥 Clear old messages for testing
 chatHistory = [];
 saveChatHistory();
+
 
 
 // Email setup
