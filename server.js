@@ -35,23 +35,11 @@ if (fs.existsSync(historyFile)) {
   }
 }
 
-// 🔥 Clear old messages for testing
-let chatHistory = [];
-const historyFile = './chatHistory.json';
-if (fs.existsSync(historyFile)) {
-  try {
-    chatHistory = JSON.parse(fs.readFileSync(historyFile));
-  } catch (err) {
-    console.error('⚠️ Failed to read chat history:', err);
-    chatHistory = [];
-  }
+// 🔥 Optional: Clear chat history for testing (disable in production)
+if (process.env.NODE_ENV !== 'production') {
+  chatHistory = [];
+  saveChatHistory();
 }
-
-// 🔥 Clear old messages for testing
-chatHistory = [];
-saveChatHistory();
-
-
 
 // Email setup
 const transporter = nodemailer.createTransport({
@@ -100,32 +88,31 @@ io.on('connection', (socket) => {
 
   // Handle new chat messages
   socket.on('chat message', (msg) => {
-  const sanitizedText = (msg.text || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const message = {
-    from: msg.from || 'unknown',
-    text: sanitizedText,
-    timestamp: new Date().toISOString()
-  };
-  chatHistory.push(message);
-  saveChatHistory();
-  io.emit('chat message', message);
+    const sanitizedText = (msg.text || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const message = {
+      from: msg.from || 'unknown',
+      text: sanitizedText,
+      timestamp: new Date().toISOString()
+    };
+    chatHistory.push(message);
+    saveChatHistory();
+    io.emit('chat message', message);
 
-  // Auto-reply only once per session
-  if (msg.from === 'customer' && !socket.autoReplySent) {
-    socket.autoReplySent = true; // flag to prevent multiple replies
-    setTimeout(() => {
-      const autoReply = {
-        from: 'staff',
-        text: 'Thanks for reaching out! We’ll be with you shortly.',
-        timestamp: new Date().toISOString()
-      };
-      chatHistory.push(autoReply);
-      saveChatHistory();
-      io.emit('chat message', autoReply);
-    }, 1000); // Delay for realism
-  }
-});
-
+    // Auto-reply only once per session
+    if (msg.from === 'customer' && !socket.autoReplySent) {
+      socket.autoReplySent = true;
+      setTimeout(() => {
+        const autoReply = {
+          from: 'staff',
+          text: 'Thanks for reaching out! We’ll be with you shortly.',
+          timestamp: new Date().toISOString()
+        };
+        chatHistory.push(autoReply);
+        saveChatHistory();
+        io.emit('chat message', autoReply);
+      }, 1000);
+    }
+  });
 
   // Typing indicator
   socket.on('typing', (data) => {
