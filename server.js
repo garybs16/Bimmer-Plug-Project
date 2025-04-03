@@ -35,6 +35,25 @@ if (fs.existsSync(historyFile)) {
   }
 }
 
+// 🔥 Clear old messages for testing
+chatHistory = [];
+saveChatHistory();
+let chatHistory = [];
+const historyFile = './chatHistory.json';
+if (fs.existsSync(historyFile)) {
+  try {
+    chatHistory = JSON.parse(fs.readFileSync(historyFile));
+  } catch (err) {
+    console.error('⚠️ Failed to read chat history:', err);
+    chatHistory = [];
+  }
+}
+
+// 🔥 Clear old messages for testing
+chatHistory = [];
+saveChatHistory();
+
+
 // Email setup
 const transporter = nodemailer.createTransport({
   service: 'gmail',
