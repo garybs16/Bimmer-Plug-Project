@@ -52,27 +52,43 @@
         <h2 class="text-3xl font-bold text-gray-900">Live Chat</h2>
         <p class="text-gray-800 mt-1 text-lg">We’re here to help! Ask us anything about Bimmer Plug products or services.</p>
       </div>
-
+  
       <div class="bg-white/30 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 flex flex-col min-h-[500px] max-h-[80vh] overflow-hidden">
         <div id="chatHistory" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
           <!-- Chat messages appear here -->
         </div>
-
+  
         <div id="typingIndicator" class="text-sm text-gray-500 mb-2 hidden">Staff is typing...</div>
-
-        <form id="chatForm" class="flex flex-col sm:flex-row gap-3">
-          <input type="text" id="userInput" placeholder="Type your message..." class="flex-1 border border-gray-300 rounded-md px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0693E3] text-sm" required />
-          <button type="submit" class="bg-[#0693E3] hover:bg-blue-600 text-white px-5 py-2 rounded-md font-medium shadow transition text-sm">
-            Send
+  
+        <form id="chatForm" class="flex gap-3 items-center">
+          <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx" class="hidden" />
+          
+          <!-- 📎 Attach Icon Button -->
+          <button type="button" title="Attach File">
+            <label for="fileInput" class="cursor-pointer bg-gray-200 p-3 rounded-full hover:bg-gray-300 shadow">
+              <i class="fas fa-paperclip text-gray-700 text-lg"></i>
+            </label>
           </button>
-          <button type="button" id="endChat" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md font-medium shadow transition text-sm">
-            End
+  
+          <input type="text" id="userInput" placeholder="Type your message..."
+            class="flex-1 border border-gray-300 rounded-md px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0693E3] text-sm" required />
+  
+          <!-- 📨 Modern Send Icon -->
+          <button type="submit" title="Send Message"
+            class="bg-[#0693E3] hover:bg-blue-600 text-white p-3 rounded-full shadow transition">
+            <i class="fas fa-arrow-up-right-from-square text-lg"></i>
+          </button>
+  
+          <!-- ❌ Modern End Chat Icon -->
+          <button type="button" id="endChat" title="End Chat"
+            class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow transition">
+            <i class="fas fa-phone-slash text-lg"></i>
           </button>
         </form>
       </div>
     </div>
   </section>
-
+  
   <!-- Footer -->
   <footer class="bg-black text-white border-t border-gray-800 text-sm mt-12">
     <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col items-center space-y-6">
@@ -105,10 +121,7 @@
     const chatHistory = document.getElementById('chatHistory');
     const typingIndicator = document.getElementById('typingIndicator');
     const endChatButton = document.getElementById('endChat');
-
-    socket.on('connect', () => {
-      console.log("✅ Connected to server:", socket.id);
-    });
+    const fileInput = document.getElementById('fileInput');
 
     const formatTime = (dateStr) => {
       const date = new Date(dateStr);
@@ -118,9 +131,20 @@
     function renderMessage(msg) {
       const wrapper = document.createElement('div');
       wrapper.className = `fade-in ${msg.from === 'customer' ? 'text-right' : 'text-left'}`;
+      
+      let content = '';
+      if (msg.data && msg.type) {
+        const isImage = msg.type.startsWith('image/');
+        content = isImage
+          ? `<img src="${msg.data}" alt="${msg.name}" class="max-w-xs rounded-md" />`
+          : `<a href="${msg.data}" download="${msg.name}" class="text-blue-600 underline">${msg.name}</a>`;
+      } else {
+        content = msg.text;
+      }
+
       wrapper.innerHTML = `
         <div class="${msg.from === 'customer' ? 'bg-black text-white ml-auto' : 'bg-[#E8F4FD] text-black'} inline-block px-4 py-2 rounded-xl max-w-[80%]">
-          ${msg.text}
+          ${content}
           <div class="text-xs text-gray-500 mt-1">${formatTime(msg.timestamp)}</div>
         </div>
       `;
@@ -128,11 +152,9 @@
       chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 
-    function saveMessage(msg) {
-      const existing = JSON.parse(localStorage.getItem('chatHistory')) || [];
-      existing.push(msg);
-      localStorage.setItem('chatHistory', JSON.stringify(existing));
-    }
+    socket.on('connect', () => {
+      console.log("✅ Connected to server:", socket.id);
+    });
 
     socket.on('chat history', (history) => {
       chatHistory.innerHTML = '';
@@ -142,7 +164,10 @@
 
     socket.on('chat message', (msg) => {
       renderMessage(msg);
-      saveMessage(msg);
+    });
+
+    socket.on('chat file', (msg) => {
+      renderMessage(msg);
     });
 
     socket.on('chat ended', () => {
@@ -166,9 +191,27 @@
       const text = userInput.value.trim();
       if (!text) return;
 
-      const msg = { from: 'customer', text };
+      const msg = { from: 'customer', text, timestamp: new Date().toISOString() };
       socket.emit('chat message', msg);
       userInput.value = '';
+    });
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const msg = {
+          from: 'customer',
+          name: file.name,
+          type: file.type,
+          data: reader.result,
+          timestamp: new Date().toISOString()
+        };
+        socket.emit('chat file', msg);
+      };
+      reader.readAsDataURL(file);
     });
 
     userInput.addEventListener('input', () => {
@@ -181,6 +224,5 @@
       }
     });
   </script>
-
 </body>
 </html>
