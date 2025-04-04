@@ -35,12 +35,6 @@ if (fs.existsSync(historyFile)) {
   }
 }
 
-// 🔥 Optional: Clear chat history for testing (disable in production)
-if (process.env.NODE_ENV !== 'production') {
-  chatHistory = [];
-  saveChatHistory();
-}
-
 // Email setup
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -60,7 +54,8 @@ function saveChatHistory() {
 
 function sendChatTranscript(messages) {
   const formatted = messages.map(msg => {
-    return `[${msg.from.toUpperCase()}] ${msg.text} (${new Date(msg.timestamp).toLocaleString()})`;
+    const content = msg.text || msg.name || '[File]';
+    return `[${msg.from.toUpperCase()}] ${content} (${new Date(msg.timestamp).toLocaleString()})`;
   }).join('\n');
 
   const mailOptions = {
@@ -97,21 +92,20 @@ io.on('connection', (socket) => {
     chatHistory.push(message);
     saveChatHistory();
     io.emit('chat message', message);
+  });
 
-    // Auto-reply only once per session
-    if (msg.from === 'customer' && !socket.autoReplySent) {
-      socket.autoReplySent = true;
-      setTimeout(() => {
-        const autoReply = {
-          from: 'staff',
-          text: 'Thanks for reaching out! We’ll be with you shortly.',
-          timestamp: new Date().toISOString()
-        };
-        chatHistory.push(autoReply);
-        saveChatHistory();
-        io.emit('chat message', autoReply);
-      }, 1000);
-    }
+  // 🔥 Handle file attachments
+  socket.on('chat file', (msg) => {
+    const fileMessage = {
+      from: msg.from || 'unknown',
+      name: msg.name || 'attachment',
+      type: msg.type || 'application/octet-stream',
+      data: msg.data,
+      timestamp: msg.timestamp || new Date().toISOString()
+    };
+    chatHistory.push(fileMessage);
+    saveChatHistory();
+    io.emit('chat file', fileMessage);
   });
 
   // Typing indicator
