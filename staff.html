@@ -85,17 +85,33 @@
     const formatTime = (ts) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     function renderMessage(msg) {
-      const div = document.createElement('div');
-      div.className = `fade-in ${msg.from === 'staff' ? 'text-right' : 'text-left'}`;
-      div.innerHTML = `
-        <div class="${msg.from === 'staff' ? 'bg-blue-600 text-white ml-auto' : 'bg-gray-100 text-black'} inline-block px-4 py-2 rounded-xl max-w-[80%]">
-          ${msg.text}
-          <div class="text-xs text-gray-300 mt-1">${formatTime(msg.timestamp)}</div>
-        </div>
-      `;
-      chatHistory.appendChild(div);
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
+  const div = document.createElement('div');
+  div.className = `fade-in ${msg.from === 'staff' ? 'text-right' : 'text-left'}`;
+
+  let content = '';
+
+  if (msg.data && msg.type) {
+    const isImage = msg.type.startsWith('image/');
+    content = isImage
+      ? `<img src="${msg.data}" alt="${msg.name || 'Image'}" class="max-w-xs rounded-md" />`
+      : `<a href="${msg.data}" download="${msg.name || 'file'}" class="text-blue-600 underline">${msg.name || 'Download file'}</a>`;
+  } else if (msg.text) {
+    content = msg.text;
+  } else {
+    content = '<span class="text-gray-400 italic">[Unsupported message]</span>';
+  }
+
+  div.innerHTML = `
+    <div class="${msg.from === 'staff' ? 'bg-blue-600 text-white ml-auto' : 'bg-gray-100 text-black'} inline-block px-4 py-2 rounded-xl max-w-[80%]">
+      ${content}
+      <div class="text-xs text-gray-300 mt-1">${formatTime(msg.timestamp)}</div>
+    </div>
+  `;
+
+  chatHistory.appendChild(div);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
 
     socket.on('chat history', (history) => {
       chatHistory.innerHTML = '';
