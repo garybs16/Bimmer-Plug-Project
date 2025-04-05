@@ -78,13 +78,6 @@ function sendChatTranscript(messages) {
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
 
-  // ✅ Send automated welcome message ONCE per connection
-  socket.emit('chat message', {
-    from: 'staff',
-    text: 'Thank you for reaching out, the staff will be with you shortly.',
-    timestamp: new Date().toISOString()
-  });
-
   // Send chat history on connection
   socket.emit('chat history', chatHistory);
 
@@ -132,4 +125,20 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
+});
+
+// Optional health check route
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
+// Optional fallback to index.html (useful for SPA routing)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Start server (use Render-assigned PORT if available)
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(🚀 Chat server running on http://localhost:${PORT});
 });
