@@ -74,6 +74,25 @@ function sendChatTranscript(messages) {
   });
 }
 
+
+// automated msg
+io.on('connection', function (socket) {
+  let welcomeSent = false;
+
+  // ✅ Only send welcome once per socket
+  if (!welcomeSent) {
+    socket.emit('chat message', {
+      from: 'staff',
+      text: 'Thank you for reaching out, the staff will be with you shortly.',
+      timestamp: new Date().toISOString()
+    });
+    welcomeSent = true;
+  }
+
+  // ...rest of your code
+});
+
+
 // Socket.IO logic
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
