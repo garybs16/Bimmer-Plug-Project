@@ -75,12 +75,13 @@ function sendChatTranscript(messages) {
 }
 
 // Socket.IO logic
+
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
 
   socket.emit('chat history', chatHistory);
 
-  let hasGreeted = false; // ensure auto-reply happens only once
+  let hasGreeted = false;
 
   // Handle new chat messages
   socket.on('chat message', (msg) => {
@@ -94,7 +95,6 @@ io.on('connection', (socket) => {
     saveChatHistory();
     io.emit('chat message', message);
 
-    // ✅ Trigger auto message only after first customer message
     if (msg.from === 'customer' && !hasGreeted) {
       hasGreeted = true;
 
@@ -112,25 +112,38 @@ io.on('connection', (socket) => {
             timestamp: new Date().toISOString()
           });
         }, 1000);
-      }, 500); // Optional delay after first message
+      }, 500);
     }
+  });
+
+  // Handle new chat messages
+  socket.on('chat message', (msg) => {
+    const sanitizedText = (msg.text || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const message = {
+      from: msg.from || 'unknown',
+      text: sanitizedText,
+      timestamp: new Date().toISOString()
+    };
+    chatHistory.push(message);
+    saveChatHistory();
+    io.emit('chat message', message);
   });
 
   // 🔥 Handle file attachments
   socket.on('chat file', (msg) => {
-    const fileMessage = {
-      from: msg.from || 'unknown',
-      name: msg.name || 'attachment',
-      type: msg.type || 'application/octet-stream',
-      data: msg.data,
-      timestamp: msg.timestamp || new Date().toISOString()
-    };
-    chatHistory.push(fileMessage);
-    saveChatHistory();
-
-    // ✅ Send to all clients
-    io.emit('chat file', fileMessage);
-  });
+  const fileMessage = {
+    from: msg.from || 'unknown',
+    name: msg.name || 'attachment',
+    type: msg.type || 'application/octet-stream',
+    data: msg.data,
+    timestamp: msg.timestamp || new Date().toISOString()
+  };
+  chatHistory.push(fileMessage);
+  saveChatHistory();
+  
+  // ✅ Send to all clients
+  io.emit('chat file', fileMessage);
+});
 
   // Typing indicator
   socket.on('typing', (data) => {
@@ -149,4 +162,20 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
+});
+
+// Optional health check route
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
+// Optional fallback to index.html (useful for SPA routing)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// ✅ Start server (use Render-assigned PORT if available)
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 Chat server running on http://localhost:${PORT}`);
 });
