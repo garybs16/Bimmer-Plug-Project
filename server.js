@@ -79,22 +79,24 @@ io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
 
   socket.emit('chat history', chatHistory);
-let greeted = localStorage.getItem('hasGreeted');
 
-chatForm.addEventListener('submit', function (e) {
-  e.preventDefault();
-  const text = userInput.value.trim();
-  if (!text) return;
+  let hasGreeted = false;
 
-  const msg = { from: 'customer', text, timestamp: new Date().toISOString() };
-  socket.emit('chat message', msg);
-  userInput.value = '';
+  // ✅ Handle new chat messages from customer or staff
+  socket.on('chat message', (msg) => {
+    const sanitizedText = (msg.text || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const message = {
+      from: msg.from || 'unknown',
+      text: sanitizedText,
+      timestamp: new Date().toISOString()
+    };
+    chatHistory.push(message);
+    saveChatHistory();
+    io.emit('chat message', message);
 
-  // Mark greeting as sent (prevents auto-reply again on reconnect)
-  if (!greeted) {
-    localStorage.setItem('hasGreeted', 'true');
-  }
-});
+    // ✅ Send automated reply only once per connection
+    if (msg.from === 'customer' && !hasGreeted) {
+      hasGreeted = true;
 
       setTimeout(() => {
         socket.emit('chat message', {
