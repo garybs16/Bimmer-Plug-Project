@@ -78,33 +78,10 @@ function sendChatTranscript(messages) {
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
 
-  // ✅ Send automated welcome message ONCE per connection
-  socket.emit('chat message', {
-    from: 'staff',
-    text: 'Thank you for reaching out, the staff will be with you shortly.',
-    timestamp: new Date().toISOString()
-  });
-
   // Send chat history on connection
-  
-  // ✅ Send automated welcome message after short delay
-  setTimeout(() => {
-    socket.emit('chat message', {
-      from: 'staff',
-      text: 'Thank you for reaching out, the staff will be with you shortly.',
-      timestamp: new Date().toISOString()
-    });
-
-    setTimeout(() => {
-      socket.emit('chat message', {
-        from: 'staff',
-        text: 'In the meantime, feel free to write down your questions and we’ll get back to you as soon as possible.',
-        timestamp: new Date().toISOString()
-      });
-    }, 1000);
-  }, 200);
-
   socket.emit('chat history', chatHistory);
+
+  let hasGreeted = false; // Flag to prevent sending auto message multiple times
 
   // Handle new chat messages
   socket.on('chat message', (msg) => {
@@ -114,26 +91,48 @@ io.on('connection', (socket) => {
       text: sanitizedText,
       timestamp: new Date().toISOString()
     };
+    
     chatHistory.push(message);
     saveChatHistory();
     io.emit('chat message', message);
+
+    // ✅ Send auto-reply after customer sends first message
+    if (msg.from === 'customer' && !hasGreeted) {
+      hasGreeted = true;
+
+      setTimeout(() => {
+        socket.emit('chat message', {
+          from: 'staff',
+          text: 'Thank you for reaching out, the staff will be with you shortly.',
+          timestamp: new Date().toISOString()
+        });
+
+        setTimeout(() => {
+          socket.emit('chat message', {
+            from: 'staff',
+            text: 'In the meantime, feel free to write down your questions and we’ll get back to you as soon as possible.',
+            timestamp: new Date().toISOString()
+          });
+        }, 1000);
+      }, 500); // slight delay
+    }
   });
 
   // 🔥 Handle file attachments
   socket.on('chat file', (msg) => {
-  const fileMessage = {
-    from: msg.from || 'unknown',
-    name: msg.name || 'attachment',
-    type: msg.type || 'application/octet-stream',
-    data: msg.data,
-    timestamp: msg.timestamp || new Date().toISOString()
-  };
-  chatHistory.push(fileMessage);
-  saveChatHistory();
-  
-  // ✅ Send to all clients
-  io.emit('chat file', fileMessage);
-});
+    const fileMessage = {
+      from: msg.from || 'unknown',
+      name: msg.name || 'attachment',
+      type: msg.type || 'application/octet-stream',
+      data: msg.data,
+      timestamp: msg.timestamp || new Date().toISOString()
+    };
+    chatHistory.push(fileMessage);
+    saveChatHistory();
+
+    // ✅ Send to all clients
+    io.emit('chat file', fileMessage);
+  });
 
   // Typing indicator
   socket.on('typing', (data) => {
@@ -152,20 +151,4 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
-});
-
-// Optional health check route
-app.get('/ping', (req, res) => {
-  res.send('pong');
-});
-
-// Optional fallback to index.html (useful for SPA routing)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// ✅ Start server (use Render-assigned PORT if available)
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(🚀 Chat server running on http://localhost:${PORT});
 });
