@@ -75,7 +75,6 @@ function sendChatTranscript(messages) {
 }
 
 // Socket.IO logic
-
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
 
@@ -83,7 +82,7 @@ io.on('connection', (socket) => {
 
   let hasGreeted = false;
 
-  // Handle new chat messages
+  // ✅ Handle new chat messages from customer or staff
   socket.on('chat message', (msg) => {
     const sanitizedText = (msg.text || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const message = {
@@ -95,6 +94,7 @@ io.on('connection', (socket) => {
     saveChatHistory();
     io.emit('chat message', message);
 
+    // ✅ Send automated reply only once per connection
     if (msg.from === 'customer' && !hasGreeted) {
       hasGreeted = true;
 
@@ -116,34 +116,19 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle new chat messages
-  socket.on('chat message', (msg) => {
-    const sanitizedText = (msg.text || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const message = {
-      from: msg.from || 'unknown',
-      text: sanitizedText,
-      timestamp: new Date().toISOString()
-    };
-    chatHistory.push(message);
-    saveChatHistory();
-    io.emit('chat message', message);
-  });
-
   // 🔥 Handle file attachments
   socket.on('chat file', (msg) => {
-  const fileMessage = {
-    from: msg.from || 'unknown',
-    name: msg.name || 'attachment',
-    type: msg.type || 'application/octet-stream',
-    data: msg.data,
-    timestamp: msg.timestamp || new Date().toISOString()
-  };
-  chatHistory.push(fileMessage);
-  saveChatHistory();
-  
-  // ✅ Send to all clients
-  io.emit('chat file', fileMessage);
-});
+    const fileMessage = {
+      from: msg.from || 'unknown',
+      name: msg.name || 'attachment',
+      type: msg.type || 'application/octet-stream',
+      data: msg.data,
+      timestamp: msg.timestamp || new Date().toISOString()
+    };
+    chatHistory.push(fileMessage);
+    saveChatHistory();
+    io.emit('chat file', fileMessage);
+  });
 
   // Typing indicator
   socket.on('typing', (data) => {
