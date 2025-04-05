@@ -46,48 +46,50 @@
   </header>
 
   <!-- Chat Section -->
-  <section class="max-w-4xl mx-auto px-4 py-10 flex-1 w-full">
-    <div class="bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl p-6 ring-1 ring-white/20">
-      <div class="mb-6">
-        <h2 class="text-3xl font-bold text-gray-900">Live Chat</h2>
-        <p class="text-gray-800 mt-1 text-lg">We’re here to help! Ask us anything about Bimmer Plug products or services.</p>
-      </div>
-  
-      <div class="bg-white/30 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 flex flex-col min-h-[500px] max-h-[80vh] overflow-hidden">
-        <div id="chatHistory" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
-          <!-- Chat messages appear here -->
-        </div>
-  
-        <div id="typingIndicator" class="text-sm text-gray-500 mb-2 hidden">Staff is typing...</div>
-  
-        <form id="chatForm" class="flex gap-3 items-center">
-          <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx" class="hidden" />
-          
-          <!-- 📎 Attach Icon Button -->
-          <button type="button" title="Attach File">
-            <label for="fileInput" class="cursor-pointer bg-gray-200 p-3 rounded-full hover:bg-gray-300 shadow">
-              <i class="fas fa-paperclip text-gray-700 text-lg"></i>
-            </label>
-          </button>
-  
-          <input type="text" id="userInput" placeholder="Type your message..."
-            class="flex-1 border border-gray-300 rounded-md px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0693E3] text-sm" required />
-  
-          <!-- 📨 Modern Send Icon -->
-          <button type="submit" title="Send Message"
-            class="bg-[#0693E3] hover:bg-blue-600 text-white p-3 rounded-full shadow transition">
-            <i class="fas fa-arrow-up-right-from-square text-lg"></i>
-          </button>
-  
-          <!-- ❌ Modern End Chat Icon -->
-          <button type="button" id="endChat" title="End Chat"
-            class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow transition">
-            <i class="fas fa-phone-slash text-lg"></i>
-          </button>
-        </form>
-      </div>
+  <!-- Chat Section -->
+<section class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 w-full">
+  <div class="bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl p-4 sm:p-6 ring-1 ring-white/20">
+    <div class="mb-4 sm:mb-6">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Live Chat</h2>
+      <p class="text-gray-800 mt-1 text-base sm:text-lg">We’re here to help! Ask us anything about Bimmer Plug products or services.</p>
     </div>
-  </section>
+
+    <div class="bg-white/30 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-4 sm:p-6 flex flex-col h-[70vh] sm:min-h-[500px] max-h-[80vh] overflow-hidden">
+      <div id="chatHistory" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
+        <!-- Chat messages appear here -->
+      </div>
+
+      <div id="typingIndicator" class="text-sm text-gray-500 mb-2 hidden">Staff is typing...</div>
+
+      <form id="chatForm" class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+        <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx" class="hidden" />
+
+        <!-- 📎 Attach Icon Button -->
+        <label for="fileInput" title="Attach File" class="sm:order-none order-1">
+          <div class="cursor-pointer bg-gray-200 p-3 rounded-full hover:bg-gray-300 shadow text-center sm:w-auto w-full">
+            <i class="fas fa-paperclip text-gray-700 text-lg"></i>
+          </div>
+        </label>
+
+        <input type="text" id="userInput" placeholder="Type your message..."
+          class="flex-1 border border-gray-300 rounded-md px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0693E3] text-sm w-full sm:w-auto" required />
+
+        <!-- 📨 Send Button -->
+        <button type="submit" title="Send Message"
+          class="bg-[#0693E3] hover:bg-blue-600 text-white p-3 rounded-full shadow transition sm:w-auto w-full text-center">
+          <i class="fas fa-arrow-up-right-from-square text-lg"></i>
+        </button>
+
+        <!-- ❌ End Chat Button -->
+        <button type="button" id="endChat" title="End Chat"
+          class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow transition sm:w-auto w-full text-center">
+          <i class="fas fa-phone-slash text-lg"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
   
   <!-- Footer -->
   <footer class="bg-black text-white border-t border-gray-800 text-sm mt-12">
