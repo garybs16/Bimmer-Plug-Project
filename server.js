@@ -86,6 +86,24 @@ io.on('connection', (socket) => {
   });
 
   // Send chat history on connection
+  
+  // ✅ Send automated welcome message after short delay
+  setTimeout(() => {
+    socket.emit('chat message', {
+      from: 'staff',
+      text: 'Thank you for reaching out, the staff will be with you shortly.',
+      timestamp: new Date().toISOString()
+    });
+
+    setTimeout(() => {
+      socket.emit('chat message', {
+        from: 'staff',
+        text: 'In the meantime, feel free to write down your questions and we’ll get back to you as soon as possible.',
+        timestamp: new Date().toISOString()
+      });
+    }, 1000);
+  }, 200);
+
   socket.emit('chat history', chatHistory);
 
   // Handle new chat messages
