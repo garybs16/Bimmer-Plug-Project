@@ -85,6 +85,15 @@ io.on('connection', (socket) => {
     timestamp: new Date().toISOString()
   });
 
+  // ✅ Follow-up prompt after a brief delay
+  setTimeout(() => {
+    socket.emit('chat message', {
+      from: 'staff',
+      text: 'In the meantime, feel free to write down your questions and we’ll get back to you as soon as possible.',
+      timestamp: new Date().toISOString()
+    });
+  }, 1000); // Delay = 1 second
+
   // Send chat history on connection
   socket.emit('chat history', chatHistory);
 
@@ -100,6 +109,8 @@ io.on('connection', (socket) => {
     saveChatHistory();
     io.emit('chat message', message);
   });
+});
+
 
   // 🔥 Handle file attachments
   socket.on('chat file', (msg) => {
