@@ -78,28 +78,17 @@ function sendChatTranscript(messages) {
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
 
-  // ✅ Send automated welcome message with short delay
-  setTimeout(() => {
-    socket.emit('chat message', {
-      from: 'staff',
-      text: 'Thank you for reaching out, the staff will be with you shortly.',
-      timestamp: new Date().toISOString()
-    });
+  // ✅ Send automated welcome message ONCE per connection
+  socket.emit('chat message', {
+    from: 'staff',
+    text: 'Thank you for reaching out, the staff will be with you shortly.',
+    timestamp: new Date().toISOString()
+  });
 
-    // ✅ Follow-up message after another delay
-    setTimeout(() => {
-      socket.emit('chat message', {
-        from: 'staff',
-        text: 'In the meantime, feel free to write down your questions and we’ll get back to you as soon as possible.',
-        timestamp: new Date().toISOString()
-      });
-    }, 1000); // follow-up delay
-  }, 200); // initial message delay
-
-  // ✅ Send chat history on connection
+  // Send chat history on connection
   socket.emit('chat history', chatHistory);
 
-  // ✅ Handle new chat messages from clients
+  // Handle new chat messages
   socket.on('chat message', (msg) => {
     const sanitizedText = (msg.text || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const message = {
@@ -111,9 +100,6 @@ io.on('connection', (socket) => {
     saveChatHistory();
     io.emit('chat message', message);
   });
-});
-
-
 
   // 🔥 Handle file attachments
   socket.on('chat file', (msg) => {
