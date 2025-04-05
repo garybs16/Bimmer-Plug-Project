@@ -103,17 +103,19 @@ io.on('connection', (socket) => {
 
   // 🔥 Handle file attachments
   socket.on('chat file', (msg) => {
-    const fileMessage = {
-      from: msg.from || 'unknown',
-      name: msg.name || 'attachment',
-      type: msg.type || 'application/octet-stream',
-      data: msg.data,
-      timestamp: msg.timestamp || new Date().toISOString()
-    };
-    chatHistory.push(fileMessage);
-    saveChatHistory();
-    io.emit('chat file', fileMessage);
-  });
+  const fileMessage = {
+    from: msg.from || 'unknown',
+    name: msg.name || 'attachment',
+    type: msg.type || 'application/octet-stream',
+    data: msg.data,
+    timestamp: msg.timestamp || new Date().toISOString()
+  };
+  chatHistory.push(fileMessage);
+  saveChatHistory();
+  
+  // ✅ Send to all clients
+  io.emit('chat file', fileMessage);
+});
 
   // Typing indicator
   socket.on('typing', (data) => {
