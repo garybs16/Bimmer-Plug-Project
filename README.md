@@ -33,6 +33,4 @@ Designed for **Bimmer Plug** to handle high volumes of customer inquiries effici
 - JavaScript  
 - Tailwind CSS  
 
----
 
-## 📦 Installation
